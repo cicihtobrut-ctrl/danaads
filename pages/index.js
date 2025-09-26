@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
+import Link from 'next/link';
 import styles from '../styles/Home.module.css';
 import { FaTasks, FaUsers, FaWallet, FaStore } from 'react-icons/fa';
 
 export default function HomePage() {
   const [user, setUser] = useState(null);
   const [isTelegram, setIsTelegram] = useState(false);
-  const [totalPoints, setTotalPoints] = useState(0); // Poin sekarang akan dari DB
-  const [isLoading, setIsLoading] = useState(true); // State untuk loading
+  const [totalPoints, setTotalPoints] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (window.Telegram && window.Telegram.WebApp) {
@@ -20,17 +21,16 @@ export default function HomePage() {
         const userData = tg.initDataUnsafe.user;
         setUser(userData);
         
-        // Panggil API untuk sinkronisasi dan ambil data poin
         syncAndFetchUser(userData);
       } else {
-        setIsLoading(false); // Tidak ada data user, berhenti loading
+        setIsLoading(false);
       }
       
       tg.MainButton.setText('Tutup');
       tg.MainButton.show();
       tg.MainButton.onClick(() => tg.close());
     } else {
-      setIsLoading(false); // Bukan di Telegram, berhenti loading
+      setIsLoading(false);
     }
   }, []);
 
@@ -49,16 +49,15 @@ export default function HomePage() {
       }
 
       const dbUser = await response.json();
-      setTotalPoints(dbUser.points); // Update poin dari database
+      setTotalPoints(dbUser.points);
 
     } catch (error) {
       console.error(error);
-      // Tampilkan alert jika gagal sinkronisasi
       if(window.Telegram && window.Telegram.WebApp) {
         window.Telegram.WebApp.showAlert('Gagal mengambil data poin dari server.');
       }
     } finally {
-      setIsLoading(false); // Selesai sinkronisasi, berhenti loading
+      setIsLoading(false);
     }
   };
 
@@ -103,10 +102,13 @@ export default function HomePage() {
         </div>
 
         <div className={styles.menuGrid}>
-          <button className={styles.menuButton} onClick={() => handleMenuClick('Tugas')}>
-            <FaTasks size={24} /> 
-            <span>Tugas</span>
-          </button>
+          <Link href="/tasks" passHref>
+            <a className={styles.menuButton}>
+              <FaTasks size={24} /> 
+              <span>Tugas</span>
+            </a>
+          </Link>
+          
           <button className={styles.menuButton} onClick={() => handleMenuClick('Referral')}>
             <FaUsers size={24} />
             <span>Referral</span>
