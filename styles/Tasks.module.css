@@ -9,6 +9,47 @@
   margin-bottom: 25px;
 }
 
+/* Style untuk Kartu Iklan Spesial */
+.adCard {
+  background: linear-gradient(45deg, #a774e1, #8774e1);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 25px;
+  text-align: center;
+  color: white;
+}
+
+.adCard h3 {
+  margin: 0 0 10px 0;
+  font-size: 18px;
+}
+
+.adCard p {
+  margin: 0 0 15px 0;
+  opacity: 0.9;
+  font-size: 14px;
+}
+
+.adButton {
+  background-color: white;
+  color: #8774e1;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 25px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.adButton:active {
+    transform: scale(0.95);
+}
+.adButton:disabled {
+    background-color: #ccc;
+    color: #888;
+    cursor: not-allowed;
+}
+
 .taskList {
   display: flex;
   flex-direction: column;
@@ -49,7 +90,7 @@
   font-size: 14px;
   font-weight: 600;
   color: #feda3a;
-  flex-shrink: 0; /* Mencegah reward mengecil */
+  flex-shrink: 0;
 }
 
 .taskActions {
