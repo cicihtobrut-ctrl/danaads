@@ -6,7 +6,7 @@ export default function Document() {
       <Head>
         {/* Script Wajib dari Telegram Mini App */}
         <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script src="https://telegram.org/js/telegram-web-app.js" async></scr>
+<script src="https://telegram.org/js/telegram-web-app.js" async></script>
 
       </Head>
       <body>
