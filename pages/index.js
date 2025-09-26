@@ -1,34 +1,66 @@
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
-
-// Import style dari CSS Module
 import styles from '../styles/Home.module.css';
-
-// Import ikon dari library react-icons (kita gunakan set Font Awesome 'Fa')
 import { FaTasks, FaUsers, FaWallet, FaStore } from 'react-icons/fa';
 
 export default function HomePage() {
   const [user, setUser] = useState(null);
   const [isTelegram, setIsTelegram] = useState(false);
-  const [totalPoints, setTotalPoints] = useState(0);
+  const [totalPoints, setTotalPoints] = useState(0); // Poin sekarang akan dari DB
+  const [isLoading, setIsLoading] = useState(true); // State untuk loading
 
   useEffect(() => {
     if (window.Telegram && window.Telegram.WebApp) {
       const tg = window.Telegram.WebApp;
       setIsTelegram(true);
-      
       tg.ready();
       tg.expand();
 
       if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-        setUser(tg.initDataUnsafe.user);
+        const userData = tg.initDataUnsafe.user;
+        setUser(userData);
+        
+        // Panggil API untuk sinkronisasi dan ambil data poin
+        syncAndFetchUser(userData);
+      } else {
+        setIsLoading(false); // Tidak ada data user, berhenti loading
       }
       
       tg.MainButton.setText('Tutup');
       tg.MainButton.show();
       tg.MainButton.onClick(() => tg.close());
+    } else {
+      setIsLoading(false); // Bukan di Telegram, berhenti loading
     }
   }, []);
+
+  const syncAndFetchUser = async (userData) => {
+    try {
+      const response = await fetch('/api/sync-user', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ user: userData }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to sync user data');
+      }
+
+      const dbUser = await response.json();
+      setTotalPoints(dbUser.points); // Update poin dari database
+
+    } catch (error) {
+      console.error(error);
+      // Tampilkan alert jika gagal sinkronisasi
+      if(window.Telegram && window.Telegram.WebApp) {
+        window.Telegram.WebApp.showAlert('Gagal mengambil data poin dari server.');
+      }
+    } finally {
+      setIsLoading(false); // Selesai sinkronisasi, berhenti loading
+    }
+  };
 
   const handleMenuClick = (menu) => {
     if (window.Telegram && window.Telegram.WebApp) {
@@ -37,13 +69,12 @@ export default function HomePage() {
   };
 
   return (
-    // Menggunakan className dari file Home.module.css
     <div className={styles.container}>
       <Head>
         <title>My Awesome Mini App</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
       </Head>
-
+      
       <header className={styles.header}>
         {user ? (
           <div>
@@ -64,11 +95,14 @@ export default function HomePage() {
       <main className={styles.main}>
         <div className={styles.balanceCard}>
           <p className={styles.balanceText}>Total Poin Anda</p>
-          <h2 className={styles.balanceAmount}>{totalPoints.toLocaleString()} Poin</h2>
+          {isLoading ? (
+            <h2 className={styles.balanceAmount}>Loading...</h2>
+          ) : (
+            <h2 className={styles.balanceAmount}>{totalPoints.toLocaleString()} Poin</h2>
+          )}
         </div>
 
         <div className={styles.menuGrid}>
-          {/* Menggunakan komponen Ikon di dalam tombol */}
           <button className={styles.menuButton} onClick={() => handleMenuClick('Tugas')}>
             <FaTasks size={24} /> 
             <span>Tugas</span>
@@ -90,5 +124,4 @@ export default function HomePage() {
     </div>
   );
 }
-
 
