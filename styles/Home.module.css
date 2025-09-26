@@ -1,0 +1,101 @@
+/* File: styles/Home.module.css */
+
+.container {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  font-family: sans-serif;
+}
+
+.header {
+  margin-bottom: 20px;
+}
+
+.greeting {
+  font-size: 24px;
+  margin: 0;
+  font-weight: 600;
+}
+
+.userId {
+  font-size: 14px;
+  color: var(--hint-color, #aaaaaa); /* Menggunakan variabel dari Telegram jika ada */
+  margin: 4px 0 0 0;
+}
+
+.main {
+  flex: 1;
+}
+
+.balanceCard {
+  background-color: var(--secondary-bg-color, #2b2b2b);
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.balanceText {
+  margin: 0;
+  font-size: 16px;
+  color: var(--hint-color, #aaaaaa);
+}
+
+.balanceAmount {
+  margin: 8px 0 0 0;
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.menuGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* 2 kolom untuk tampilan mobile */
+  gap: 15px;
+}
+
+.menuButton {
+  background-color: var(--button-color, #8774e1);
+  color: var(--button-text-color, #ffffff);
+  border: none;
+  border-radius: 10px;
+  padding: 15px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px; /* Jarak antara ikon dan teks */
+  transition: transform 0.2s;
+}
+
+.menuButton:active {
+    transform: scale(0.95);
+}
+
+.warningBox {
+  background-color: #ffc107;
+  color: #000;
+  padding: 10px;
+  border-radius: 8px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* --- Media Query untuk Responsif --- */
+/* Terapkan style ini jika lebar layar 768px atau lebih (tablet/desktop) */
+/* Ini akan sangat berguna untuk Admin Panel Anda */
+@media (min-width: 768px) {
+  .menuGrid {
+    grid-template-columns: 1fr 1fr 1fr 1fr; /* Ubah menjadi 4 kolom */
+  }
+
+  .container {
+    max-width: 960px;
+    margin: 0 auto; /* Pusatkan container di layar besar */
+  }
+}
+
