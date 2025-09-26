@@ -1,6 +1,5 @@
-import { supabase } from '../../lib/supabaseClient';
+import { createPagesServerClient } from '@supabase/ssr';
 
-// Tentukan jumlah poin yang diberikan setiap kali menonton iklan
 const AD_REWARD_AMOUNT = 50;
 
 export default async function handler(req, res) {
@@ -8,13 +7,14 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
+  const supabase = createPagesServerClient({ req, res });
+
   try {
     const { userId } = req.body;
     if (!userId) {
       return res.status(400).json({ error: 'User ID dibutuhkan.' });
     }
     
-    // Panggil fungsi database yang aman untuk memberikan hadiah
     const { error } = await supabase.rpc('award_points_for_ad_watch', {
       p_user_id: userId,
       p_reward_amount: AD_REWARD_AMOUNT

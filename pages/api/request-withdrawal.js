@@ -1,12 +1,13 @@
-import { supabase } from '../../lib/supabaseClient';
+import { createPagesServerClient } from '@supabase/ssr';
 
-// Tentukan aturan, misal minimal penarikan 10.000 poin
 const MINIMUM_WITHDRAWAL = 10000;
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method Not Allowed' });
   }
+  
+  const supabase = createPagesServerClient({ req, res });
 
   try {
     const { userId, amount, method, details } = req.body;
@@ -20,12 +21,10 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: `Jumlah penarikan minimal adalah ${MINIMUM_WITHDRAWAL.toLocaleString()} poin.` });
     }
 
-    // Panggil fungsi database yang aman
-    // Kita asumsikan 1 poin = 1 Rupiah untuk saat ini
     const { error } = await supabase.rpc('request_user_withdrawal', {
       p_user_id: userId,
       p_amount_points: amountPoints,
-      p_amount_rupiah: amountPoints, // 1 Poin = 1 Rupiah
+      p_amount_rupiah: amountPoints,
       p_method: method,
       p_account_details: details
     });

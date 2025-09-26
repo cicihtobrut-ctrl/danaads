@@ -1,9 +1,11 @@
-import { supabase } from '../../lib/supabaseClient';
+import { createPagesServerClient } from '@supabase/ssr';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method Not Allowed' });
   }
+  
+  const supabase = createPagesServerClient({ req, res });
 
   try {
     const { userId, productId, targetNumber } = req.body;
@@ -12,8 +14,6 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Data tidak lengkap.' });
     }
 
-    // Gunakan RPC (Remote Procedure Call) di Supabase untuk transaksi yang aman
-    // Kita akan buat functionnya di database setelah ini
     const { data, error } = await supabase.rpc('purchase_item', {
       p_user_id: userId,
       p_product_id: productId,
@@ -21,7 +21,6 @@ export default async function handler(req, res) {
     });
     
     if (error) {
-        // Cek jika error adalah karena saldo tidak cukup
         if (error.message.includes('insufficient_points')) {
             return res.status(400).json({ error: 'Poin Anda tidak cukup.' });
         }

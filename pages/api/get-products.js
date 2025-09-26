@@ -1,16 +1,18 @@
-import { supabase } from '../../lib/supabaseClient';
+import { createPagesServerClient } from '@supabase/ssr';
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method Not Allowed' });
   }
+  
+  const supabase = createPagesServerClient({ req, res });
 
   try {
     const { data, error } = await supabase
       .from('products')
       .select('id, name, description, price, provider_icon_url, category')
       .eq('is_active', true)
-      .or('stock.gt.0,stock.eq.-1') // Stok lebih dari 0 ATAU tak terbatas (-1)
+      .or('stock.gt.0,stock.eq.-1')
       .order('price', { ascending: true });
 
     if (error) {
