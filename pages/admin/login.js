@@ -1,8 +1,11 @@
 import { useState } from 'react';
-import { supabase } from '../../lib/supabaseClient';
+import { createBrowserClient } from '../../lib/supabaseClient'; // Import fungsi baru
 import styles from '../../styles/Admin.module.css';
 
 export default function AdminLogin() {
+  // Panggil fungsi untuk membuat client di sini, hanya akan berjalan sekali di browser
+  const [supabase] = useState(() => createBrowserClient());
+  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -21,14 +24,11 @@ export default function AdminLogin() {
     if (error) {
       setMessage('Gagal login: ' + error.message);
     } else {
-      // Jika berhasil, Supabase akan menyimpan sesi di cookie
-      // dan kita redirect ke halaman dashboard admin.
       window.location.href = '/admin';
     }
     setLoading(false);
   };
   
-  // Fungsi ini hanya untuk Anda (admin) mendaftar sekali saja
   const handleSignUp = async () => {
     setLoading(true);
     const { error } = await supabase.auth.signUp({
@@ -69,7 +69,6 @@ export default function AdminLogin() {
             {loading ? 'Loading...' : 'Login'}
           </button>
           
-          {/* Tombol ini hanya untuk pendaftaran pertama kali. Hapus/sembunyikan setelah Anda punya akun. */}
           <button type="button" onClick={handleSignUp} disabled={loading} className={`${styles.button} ${styles.secondaryButton}`}>
             Daftar (Admin Baru)
           </button>
