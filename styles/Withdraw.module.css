@@ -1,0 +1,73 @@
+.container {
+  padding: 20px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 25px;
+}
+
+.balanceInfo {
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: var(--secondary-bg-color, #2b2b2b);
+  border-radius: 12px;
+  text-align: center;
+}
+.balanceInfo p {
+  margin: 0;
+  color: var(--hint-color, #aaaaaa);
+}
+.balanceInfo span {
+    font-weight: 700;
+    font-size: 20px;
+    color: var(--text-color, #ffffff);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.formGroup label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.input, .select {
+  width: 100%;
+  padding: 12px;
+  background-color: #3e3e3e;
+  border: 1px solid #555;
+  border-radius: 8px;
+  color: white;
+  font-size: 16px;
+}
+
+.submitButton {
+  background-color: var(--button-color, #8774e1);
+  color: var(--button-text-color, #ffffff);
+  border: none;
+  border-radius: 8px;
+  padding: 15px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background-color 0.2s;
+}
+.submitButton:disabled {
+  background-color: #555;
+  cursor: not-allowed;
+}
+
+.note {
+    font-size: 13px;
+    color: var(--hint-color, #aaaaaa);
+    margin-top: 20px;
+    line-height: 1.6;
+}
+

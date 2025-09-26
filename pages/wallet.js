@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
+import Link from 'next/link'; // Import Link
 import styles from '../styles/Wallet.module.css';
-import { FaArrowDown, FaArrowUp, FaExchangeAlt } from 'react-icons/fa';
+import { FaArrowUp, FaExchangeAlt } from 'react-icons/fa';
 
 export default function WalletPage() {
   const [walletData, setWalletData] = useState({ pointsBalance: 0, transactions: [] });
@@ -69,9 +70,12 @@ export default function WalletPage() {
       </div>
 
       <div className={styles.actionGrid}>
-        <button className={styles.actionButton} onClick={() => handleActionClick('Tarik Poin')}>
-          <FaArrowUp /> Tarik Poin
-        </button>
+        {/* UBAH TOMBOL INI MENJADI LINK */}
+        <Link href="/withdraw" passHref>
+            <a className={styles.actionButton}>
+                <FaArrowUp /> Tarik Poin
+            </a>
+        </Link>
         <button className={`${styles.actionButton} ${styles.secondary}`} onClick={() => handleActionClick('Konversi')}>
           <FaExchangeAlt /> Konversi
         </button>
@@ -86,7 +90,7 @@ export default function WalletPage() {
             {walletData.transactions.map((tx) => (
               <div key={tx.id} className={styles.transactionItem}>
                 <div className={styles.transactionInfo}>
-                  <h3>{tx.description || tx.type.replace('_', ' ')}</h3>
+                  <h3>{tx.description || tx.type.replace(/_/g, ' ')}</h3>
                   <p>{formatDate(tx.created_at)}</p>
                 </div>
                 <span className={`${styles.transactionAmount} ${tx.amount >= 0 ? styles.amountPositive : styles.amountNegative}`}>

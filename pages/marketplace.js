@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
+import Image from 'next/image'; // Import komponen Image
 import styles from '../styles/Marketplace.module.css';
 
 export default function MarketplacePage() {
@@ -8,7 +9,6 @@ export default function MarketplacePage() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    // Ambil data user dari Telegram
     if (window.Telegram && window.Telegram.WebApp) {
       const tg = window.Telegram.WebApp;
       tg.ready();
@@ -17,7 +17,6 @@ export default function MarketplacePage() {
       }
     }
     
-    // Ambil daftar produk dari API
     const fetchProducts = async () => {
       try {
         const response = await fetch('/api/get-products');
@@ -36,14 +35,12 @@ export default function MarketplacePage() {
   const handlePurchase = (product) => {
     if (!user) return;
     
-    // Minta nomor tujuan ke pengguna
     window.Telegram.WebApp.showPopup({
       title: `Beli ${product.name}`,
       message: `Masukkan nomor tujuan untuk pembelian ini.`,
       buttons: [{ type: 'input', text: 'Beli Sekarang' }, { type: 'cancel' }]
     }, async (buttonId, inputValue) => {
       if (buttonId === 'input' && inputValue) {
-        // Tampilkan loading
         window.Telegram.WebApp.showProgress();
 
         try {
@@ -64,7 +61,6 @@ export default function MarketplacePage() {
             window.Telegram.WebApp.showAlert(result.error || 'Terjadi kesalahan.');
           } else {
             window.Telegram.WebApp.showAlert(result.message);
-            // Idealnya, di sini kita refresh data poin pengguna
           }
         } catch (error) {
           window.Telegram.WebApp.hideProgress();
@@ -89,7 +85,13 @@ export default function MarketplacePage() {
         <div className={styles.productGrid}>
           {products.map((product) => (
             <div key={product.id} className={styles.productCard} onClick={() => handlePurchase(product)}>
-              <img src={product.provider_icon_url} alt={product.name} className={styles.productIcon} />
+              <Image 
+                src={product.provider_icon_url} 
+                alt={product.name} 
+                className={styles.productIcon}
+                width={50} // Wajib ada untuk next/image
+                height={50} // Wajib ada untuk next/image
+              />
               <h3 className={styles.productName}>{product.name}</h3>
               <p className={styles.productPrice}>{product.price.toLocaleString()} Poin</p>
             </div>
