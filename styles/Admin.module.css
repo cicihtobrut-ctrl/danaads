@@ -1,0 +1,59 @@
+.loginContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: #1a1a1a;
+  color: white;
+}
+.loginBox {
+  width: 100%;
+  max-width: 400px;
+  padding: 40px;
+  background-color: #2a2a2a;
+  border-radius: 12px;
+}
+.title { font-size: 28px; font-weight: 600; text-align: center; margin-bottom: 10px;}
+.subtitle { text-align: center; color: #aaa; margin-bottom: 30px;}
+.form { display: flex; flex-direction: column; gap: 15px;}
+.input {
+  padding: 12px;
+  font-size: 16px;
+  background-color: #3e3e3e;
+  border: 1px solid #555;
+  border-radius: 8px;
+  color: white;
+}
+.button {
+  padding: 15px;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  background-color: #8774e1;
+  color: white;
+}
+.secondaryButton { background-color: #555; margin-top: 10px; }
+.message { text-align: center; margin-top: 20px; color: #ff6b6b;}
+
+/* Style untuk Dashboard */
+.dashboardContainer { padding: 30px; }
+.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+.table { width: 100%; border-collapse: collapse; }
+.table th, .table td { padding: 12px 15px; border-bottom: 1px solid #3e3e3e; text-align: left;}
+.table th { background-color: #2a2a2a; }
+.statusPending { color: #feda3a; font-weight: 500;}
+.statusCompleted { color: #4caf50; font-weight: 500;}
+.statusRejected { color: #f44336; font-weight: 500;}
+.actionButtons button {
+  margin-right: 10px;
+  padding: 6px 12px;
+  font-size: 13px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.approveButton { background-color: #4caf50; color: white; }
+.rejectButton { background-color: #f44336; color: white; }
+
