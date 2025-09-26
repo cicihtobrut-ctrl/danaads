@@ -19,29 +19,39 @@ export async function getServerSideProps(ctx) {
 }
 
 export default function AdminDashboard({ user, initialRequests }) {
-  // Terapkan pola yang sama di sini
-  const [supabase] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return createPagesBrowserClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-      );
-    }
-    return null;
-  });
-
+  // Buat client Supabase untuk sisi browser di sini
+  const [supabase] = useState(() => createPagesBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  ));
+  
   const [requests, setRequests] = useState(initialRequests);
   const [loading, setLoading] = useState(false);
 
   const fetchRequests = async () => {
     if (!supabase) return;
     setLoading(true);
-    // ... sisa fungsi ini sama
+    const { data, error } = await supabase
+      .from('withdrawal_requests').select('*').order('created_at', { ascending: true });
+    
+    if (error) {
+      console.error('Error fetching requests:', error);
+    } else {
+      setRequests(data);
+    }
+    setLoading(false);
   };
 
   const handleUpdateStatus = async (id, status) => {
     if (!supabase) return;
-    // ... sisa fungsi ini sama
+    const { error } = await supabase
+      .from('withdrawal_requests').update({ status, processed_at: new Date() }).eq('id', id);
+
+    if (error) {
+      alert('Gagal mengupdate status!');
+    } else {
+      fetchRequests();
+    }
   };
 
   const handleLogout = async () => {
@@ -51,17 +61,58 @@ export default function AdminDashboard({ user, initialRequests }) {
   };
 
   return (
-    // ... Bagian JSX render di sini tetap sama persis seperti sebelumnya
-    // ... (Salin dari versi lengkap terakhir yang saya berikan)
     <div className={styles.dashboardContainer}>
       <div className={styles.header}>
         <h1 className={styles.title}>Dasbor Penarikan</h1>
         <div>
-          <span style={{marginRight: '20px', color: '#aaa'}}>Login sebagai: {user.email}</span>
-          <button onClick={handleLogout} className={styles.button}>Logout</button>
+            <span style={{marginRight: '20px', color: '#aaa'}}>Login sebagai: {user.email}</span>
+            <button onClick={handleLogout} className={styles.button}>Logout</button>
         </div>
       </div>
-      {/* ... sisa tabel ... */}
+      
+      {loading ? (
+        <p>Memuat data...</p>
+      ) : (
+        <table className={styles.table}>
+          <thead>
+            <tr>
+              <th>Tanggal</th>
+              <th>User ID</th>
+              <th>Metode</th>
+              <th>Detail Akun</th>
+              <th>Jumlah (Poin)</th>
+              <th>Status</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            {requests.map(req => (
+              <tr key={req.id}>
+                <td>{new Date(req.created_at).toLocaleString('id-ID')}</td>
+                <td>{req.user_id}</td>
+                <td>{req.method}</td>
+                <td>{req.account_details}</td>
+                <td>{req.amount_points.toLocaleString()}</td>
+                <td>
+                    <span className={
+                        req.status === 'PENDING' ? styles.statusPending :
+                        req.status === 'COMPLETED' ? styles.statusCompleted :
+                        styles.statusRejected
+                    }>{req.status}</span>
+                </td>
+                <td>
+                  {req.status === 'PENDING' && (
+                    <div className={styles.actionButtons}>
+                      <button onClick={() => handleUpdateStatus(req.id, 'COMPLETED')} className={styles.approveButton}>Setujui</button>
+                      <button onClick={() => handleUpdateStatus(req.id, 'REJECTED')} className={styles.rejectButton}>Tolak</button>
+                    </div>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
     </div>
   );
 }

@@ -3,16 +3,10 @@ import { createPagesBrowserClient } from '@supabase/ssr';
 import styles from '../../styles/Admin.module.css';
 
 export default function AdminLogin() {
-  // Pola ini memastikan client HANYA dibuat saat kode berjalan di browser
-  const [supabase] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return createPagesBrowserClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-      );
-    }
-    return null; // Saat di server, supabase akan null
-  });
+  const [supabase] = useState(() => createPagesBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  ));
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -21,7 +15,7 @@ export default function AdminLogin() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    if (!supabase) return; // Jangan lakukan apa-apa jika supabase belum siap
+    if (!supabase) return;
     setLoading(true);
     setMessage('');
 
