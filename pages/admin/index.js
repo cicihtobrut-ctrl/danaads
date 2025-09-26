@@ -1,18 +1,12 @@
-import { useState, useEffect } from 'react';
-import { createPagesServerClient } from '@supabase/ssr'; // Import dari paket baru
+import { useState } from 'react';
+import { createPagesServerClient } from '@supabase/ssr';
+import { useSupabase } from '../../lib/SupabaseProvider'; // Import hook untuk sisi browser
 import styles from '../../styles/Admin.module.css';
 
-// Fungsi ini berjalan di server sebelum halaman di-render
 export async function getServerSideProps(ctx) {
-  // Membuat client Supabase khusus untuk sisi server dengan paket baru
   const supabase = createPagesServerClient(ctx);
+  const { data: { session } } = await supabase.auth.getSession();
 
-  // Mengambil sesi pengguna
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-
-  // Jika tidak ada sesi (belum login), redirect ke halaman login
   if (!session) {
     return {
       redirect: {
@@ -22,12 +16,16 @@ export async function getServerSideProps(ctx) {
     };
   }
 
-  // Jika sudah login, kirim data user ke halaman
+  const { data: initialRequests } = await supabase
+    .from('withdrawal_requests')
+    .select('*')
+    .order('created_at', { ascending: true });
+
   return {
     props: {
+      initialSession: session,
       user: session.user,
-      // Kita juga bisa mengambil data awal di sini agar lebih cepat
-      initialRequests: (await supabase.from('withdrawal_requests').select('*').order('created_at', { ascending: true })).data || [],
+      initialRequests: initialRequests || [],
     },
   };
 }
@@ -35,9 +33,7 @@ export async function getServerSideProps(ctx) {
 export default function AdminDashboard({ user, initialRequests }) {
   const [requests, setRequests] = useState(initialRequests);
   const [loading, setLoading] = useState(false);
-  
-  // Client Supabase untuk sisi browser, diimpor dari lib
-  const { supabase } = require('../../lib/supabaseClient');
+  const supabase = useSupabase(); // Gunakan hook untuk client-side
 
   const fetchRequests = async () => {
     setLoading(true);
@@ -55,6 +51,8 @@ export default function AdminDashboard({ user, initialRequests }) {
   };
 
   const handleUpdateStatus = async (id, status) => {
+    // Pastikan supabase client tersedia sebelum digunakan
+    if (!supabase) return;
     const { error } = await supabase
       .from('withdrawal_requests')
       .update({ status: status, processed_at: new Date() })
@@ -68,6 +66,7 @@ export default function AdminDashboard({ user, initialRequests }) {
   };
 
   const handleLogout = async () => {
+    if (!supabase) return;
     await supabase.auth.signOut();
     window.location.href = '/admin/login';
   };
