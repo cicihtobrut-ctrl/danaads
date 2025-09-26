@@ -21,7 +21,6 @@ export default function HomePage() {
         setIsLoading(false);
       }
       
-      // Kita sembunyikan MainButton karena sudah ada navigasi bawah
       tg.MainButton.hide();
     } else {
       setIsLoading(false);
@@ -75,7 +74,6 @@ export default function HomePage() {
             <h2 className={styles.balanceAmount}>{totalPoints.toLocaleString()} Poin</h2>
           )}
         </div>
-        {/* Tombol-tombol menu besar kita hapus karena fungsinya sudah digantikan oleh navigasi bawah */ }
         <div style={{marginTop: '20px', textAlign: 'center', color: 'var(--hint-color)'}}>
             <p>Pilih menu di bawah untuk memulai.</p>
         </div>

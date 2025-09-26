@@ -32,13 +32,11 @@ export default function TasksPage() {
     };
     fetchTasks();
   }, []);
-
+  
   const handleWatchAd = () => {
     if (!user || adLoading) return;
-
     setAdLoading(true);
 
-    // Fungsi show_9933536 akan tersedia di object window karena sudah dimuat di _document.js
     if (typeof window.show_9933536 === 'function') {
       window.show_9933536().then(() => {
         fetch('/api/reward-ad-watch', {
@@ -54,12 +52,8 @@ export default function TasksPage() {
             window.Telegram.WebApp.showAlert(result.error || 'Gagal mendapatkan hadiah.');
           }
         })
-        .catch(() => {
-          window.Telegram.WebApp.showAlert('Gagal terhubung ke server setelah menonton iklan.');
-        })
-        .finally(() => {
-          setAdLoading(false);
-        });
+        .catch(() => window.Telegram.WebApp.showAlert('Gagal terhubung ke server setelah menonton iklan.'))
+        .finally(() => setAdLoading(false));
       }).catch(error => {
         console.error("Ad failed to show:", error);
         window.Telegram.WebApp.showAlert('Iklan tidak tersedia saat ini. Coba lagi nanti.');
@@ -72,10 +66,7 @@ export default function TasksPage() {
   };
 
   const handleClaim = async (taskId) => {
-    if (!user) {
-        window.Telegram.WebApp.showAlert('Data pengguna tidak ditemukan. Silakan coba lagi.');
-        return;
-    }
+    if (!user) return window.Telegram.WebApp.showAlert('Data pengguna tidak ditemukan. Silakan coba lagi.');
     setClaimingId(taskId);
     try {
         const response = await fetch('/api/claim-reward', {
@@ -84,12 +75,9 @@ export default function TasksPage() {
             body: JSON.stringify({ userId: user.id, taskId: taskId })
         });
         const result = await response.json();
-        if (!response.ok) {
-            throw new Error(result.error || 'Terjadi kesalahan');
-        }
+        if (!response.ok) throw new Error(result.error || 'Terjadi kesalahan');
         window.Telegram.WebApp.showAlert(result.message);
         setTasks(prevTasks => prevTasks.filter(task => task.id !== taskId));
-
     } catch (error) {
         window.Telegram.WebApp.showAlert(error.message);
     } finally {
@@ -101,13 +89,10 @@ export default function TasksPage() {
     <div className={styles.container}>
       <Head>
         <title>Daftar Tugas</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
       </Head>
-
       <div style={{ marginBottom: '25px' }}>
          <h1 className={styles.title}>Kerjakan Tugas, Dapatkan Poin</h1>
       </div>
-
       <div className={styles.adCard}>
         <h3>Tonton Iklan, Dapat Hadiah!</h3>
         <p>Tonton video singkat untuk mendapatkan 50 Poin secara instan.</p>
@@ -115,10 +100,7 @@ export default function TasksPage() {
           {adLoading ? 'Memuat Iklan...' : 'Tonton Sekarang'}
         </button>
       </div>
-
-      {isLoading ? (
-        <p>Memuat tugas...</p>
-      ) : (
+      {isLoading ? (<p>Memuat tugas...</p>) : (
         <div className={styles.taskList}>
           {tasks.map((task) => (
             <div key={task.id} className={styles.taskItem}>
@@ -127,19 +109,11 @@ export default function TasksPage() {
                   <h3>{task.title}</h3>
                   <p>{task.description}</p>
                 </div>
-                <div className={styles.taskReward}>
-                  +{task.reward} Poin
-                </div>
+                <div className={styles.taskReward}>+{task.reward} Poin</div>
               </div>
               <div className={styles.taskActions}>
-                <a href={task.task_url} target="_blank" rel="noopener noreferrer" className={styles.actionButton}>
-                  Buka Tugas
-                </a>
-                <button 
-                  className={`${styles.actionButton} ${styles.claimButton}`} 
-                  onClick={() => handleClaim(task.id)}
-                  disabled={claimingId === task.id}
-                >
+                <a href={task.task_url} target="_blank" rel="noopener noreferrer" className={styles.actionButton}>Buka Tugas</a>
+                <button className={`${styles.actionButton} ${styles.claimButton}`} onClick={() => handleClaim(task.id)} disabled={claimingId === task.id}>
                   {claimingId === task.id ? 'Memproses...' : 'Klaim Hadiah'}
                 </button>
               </div>

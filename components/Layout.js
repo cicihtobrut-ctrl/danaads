@@ -1,8 +1,8 @@
 import BottomNav from './BottomNav';
 
 export default function Layout({ children }) {
+  // Padding bawah untuk memberi ruang agar konten tidak tertutup navigasi
   return (
-    // Padding bawah pada div utama untuk memberi ruang agar konten tidak tertutup navigasi
     <div style={{ paddingBottom: '75px' }}> 
       <main>{children}</main>
       <BottomNav />

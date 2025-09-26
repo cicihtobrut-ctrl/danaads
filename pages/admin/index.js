@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { createPagesServerClient } from '@supabase/ssr';
-import { useSupabase } from '../../lib/SupabaseProvider'; // Import hook untuk sisi browser
+import { createPagesBrowserClient } from '@supabase/ssr';
 import styles from '../../styles/Admin.module.css';
 
 export async function getServerSideProps(ctx) {
@@ -8,40 +8,27 @@ export async function getServerSideProps(ctx) {
   const { data: { session } } = await supabase.auth.getSession();
 
   if (!session) {
-    return {
-      redirect: {
-        destination: '/admin/login',
-        permanent: false,
-      },
-    };
+    return { redirect: { destination: '/admin/login', permanent: false } };
   }
 
   const { data: initialRequests } = await supabase
-    .from('withdrawal_requests')
-    .select('*')
-    .order('created_at', { ascending: true });
+    .from('withdrawal_requests').select('*').order('created_at', { ascending: true });
 
-  return {
-    props: {
-      initialSession: session,
-      user: session.user,
-      initialRequests: initialRequests || [],
-    },
-  };
+  return { props: { user: session.user, initialRequests: initialRequests || [] } };
 }
 
 export default function AdminDashboard({ user, initialRequests }) {
+  const [supabase] = useState(() => createPagesBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  ));
   const [requests, setRequests] = useState(initialRequests);
   const [loading, setLoading] = useState(false);
-  const supabase = useSupabase(); // Gunakan hook untuk client-side
 
   const fetchRequests = async () => {
     setLoading(true);
     const { data, error } = await supabase
-      .from('withdrawal_requests')
-      .select('*')
-      .order('created_at', { ascending: true });
-    
+      .from('withdrawal_requests').select('*').order('created_at', { ascending: true });
     if (error) {
       console.error('Error fetching requests:', error);
     } else {
@@ -51,13 +38,8 @@ export default function AdminDashboard({ user, initialRequests }) {
   };
 
   const handleUpdateStatus = async (id, status) => {
-    // Pastikan supabase client tersedia sebelum digunakan
-    if (!supabase) return;
     const { error } = await supabase
-      .from('withdrawal_requests')
-      .update({ status: status, processed_at: new Date() })
-      .eq('id', id);
-
+      .from('withdrawal_requests').update({ status, processed_at: new Date() }).eq('id', id);
     if (error) {
       alert('Gagal mengupdate status!');
     } else {
@@ -66,7 +48,6 @@ export default function AdminDashboard({ user, initialRequests }) {
   };
 
   const handleLogout = async () => {
-    if (!supabase) return;
     await supabase.auth.signOut();
     window.location.href = '/admin/login';
   };
@@ -76,24 +57,15 @@ export default function AdminDashboard({ user, initialRequests }) {
       <div className={styles.header}>
         <h1 className={styles.title}>Dasbor Penarikan</h1>
         <div>
-            <span style={{marginRight: '20px', color: '#aaa'}}>Login sebagai: {user.email}</span>
-            <button onClick={handleLogout} className={styles.button}>Logout</button>
+          <span style={{marginRight: '20px', color: '#aaa'}}>Login sebagai: {user.email}</span>
+          <button onClick={handleLogout} className={styles.button}>Logout</button>
         </div>
       </div>
-      
-      {loading ? (
-        <p>Memuat data...</p>
-      ) : (
+      {loading ? (<p>Memuat data...</p>) : (
         <table className={styles.table}>
           <thead>
             <tr>
-              <th>Tanggal</th>
-              <th>User ID</th>
-              <th>Metode</th>
-              <th>Detail Akun</th>
-              <th>Jumlah (Poin)</th>
-              <th>Status</th>
-              <th>Aksi</th>
+              <th>Tanggal</th><th>User ID</th><th>Metode</th><th>Detail Akun</th><th>Jumlah (Poin)</th><th>Status</th><th>Aksi</th>
             </tr>
           </thead>
           <tbody>
@@ -104,13 +76,7 @@ export default function AdminDashboard({ user, initialRequests }) {
                 <td>{req.method}</td>
                 <td>{req.account_details}</td>
                 <td>{req.amount_points.toLocaleString()}</td>
-                <td>
-                    <span className={
-                        req.status === 'PENDING' ? styles.statusPending :
-                        req.status === 'COMPLETED' ? styles.statusCompleted :
-                        styles.statusRejected
-                    }>{req.status}</span>
-                </td>
+                <td><span className={req.status === 'PENDING' ? styles.statusPending : req.status === 'COMPLETED' ? styles.statusCompleted : styles.statusRejected}>{req.status}</span></td>
                 <td>
                   {req.status === 'PENDING' && (
                     <div className={styles.actionButtons}>
