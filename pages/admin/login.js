@@ -1,16 +1,71 @@
-import dynamic from 'next/dynamic';
+import { useState } from 'react';
+import { useSupabase } from '../../lib/SupabaseProvider'; // Import hook baru
 import styles from '../../styles/Admin.module.css';
 
-// Memuat komponen form secara dinamis dan menonaktifkan Server-Side Rendering (SSR)
-const AdminLoginForm = dynamic(() => import('../../components/AdminLoginForm'), {
-  ssr: false, 
-  loading: () => <p>Memuat form...</p> // Tampilan saat komponen sedang dimuat
-});
+export default function AdminLogin() {
+  const supabase = useSupabase(); // Gunakan hook untuk mengambil client
+  
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState('');
 
-export default function AdminLoginPage() {
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setMessage('');
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      setMessage('Gagal login: ' + error.message);
+    } else {
+      window.location.href = '/admin';
+    }
+    setLoading(false);
+  };
+  
+  const handleSignUp = async () => {
+    setLoading(true);
+    const { error } = await supabase.auth.signUp({ email, password });
+    if (error) {
+      setMessage('Gagal mendaftar: ' + error.message);
+    } else {
+      setMessage('Berhasil mendaftar! Silakan coba login.');
+    }
+    setLoading(false);
+  };
+
   return (
     <div className={styles.loginContainer}>
-      <AdminLoginForm />
+      <div className={styles.loginBox}>
+        <h1 className={styles.title}>Admin Panel Login</h1>
+        <p className={styles.subtitle}>Masukkan kredensial Anda untuk melanjutkan.</p>
+        <form onSubmit={handleLogin} className={styles.form}>
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            className={styles.input}
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            className={styles.input}
+          />
+          <button type="submit" disabled={loading} className={styles.button}>
+            {loading ? 'Loading...' : 'Login'}
+          </button>
+          
+          <button type="button" onClick={handleSignUp} disabled={loading} className={`${styles.button} ${styles.secondaryButton}`}>
+            Daftar (Admin Baru)
+          </button>
+        </form>
+        {message && <p className={styles.message}>{message}</p>}
+      </div>
     </div>
   );
 }

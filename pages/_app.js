@@ -1,12 +1,14 @@
+import { SupabaseProvider } from '../lib/SupabaseProvider'; // Import provider baru
+import Layout from '../components/Layout';
 import '../styles/globals.css';
-import Layout from '../components/Layout'; // Import Layout
 
 function MyApp({ Component, pageProps }) {
-  // Bungkus Component dengan Layout
   return (
-    <Layout>
-      <Component {...pageProps} />
-    </Layout>
+    <SupabaseProvider>
+      <Layout>
+        <Component {...pageProps} />
+      </Layout>
+    </SupabaseProvider>
   );
 }
 
