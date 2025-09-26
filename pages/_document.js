@@ -4,10 +4,8 @@ export default function Document() {
   return (
     <Html>
       <Head>
-        {/* Script Wajib dari Telegram Mini App */}
-        <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script src="https://telegram.org/js/telegram-web-app.js" async></script>
-
+        {/* Kode yang benar: memiliki 'async' DAN penutup '</script>' */}
+        <script src="https://telegram.org/js/telegram-web-app.js" async></script>
       </Head>
       <body>
         <Main />
@@ -16,4 +14,3 @@ export default function Document() {
     </Html>
   )
 }
-
