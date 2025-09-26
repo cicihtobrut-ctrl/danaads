@@ -3,7 +3,7 @@ import { createBrowserClient } from '../../lib/supabaseClient'; // Import fungsi
 import styles from '../../styles/Admin.module.css';
 
 export default function AdminLogin() {
-  // Panggil fungsi untuk membuat client di sini, hanya akan berjalan sekali di browser
+  // Panggil fungsi untuk membuat client di sini, hanya akan berjalan sekali di browser//
   const [supabase] = useState(() => createBrowserClient());
   
   const [email, setEmail] = useState('');
